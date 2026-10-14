@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: VideoGameRepository::class)]
 class VideoGame
@@ -15,19 +16,23 @@ class VideoGame
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['games:read'])]
+    #[Groups(['games:read', 'category:read', 'editor:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['games:read'])]
+    #[Groups(['games:read', 'category:read', 'editor:read'])]
+    #[Assert\NotBlank(message: 'Le titre est obligatoire.')]
+    #[Assert\Length(min: 1, max: 255, maxMessage: 'Le titre ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $title = null;
 
     #[ORM\Column]
     #[Groups(['games:read'])]
+    #[Assert\NotNull(message: 'La date de sortie est obligatoire.')]
     private ?\DateTimeImmutable $releaseDate = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['games:read'])]
+    #[Assert\NotBlank(message: 'La description est obligatoire.')]
     private ?string $description = null;
 
     /**
@@ -39,6 +44,8 @@ class VideoGame
 
     #[ORM\ManyToOne(inversedBy: 'videoGames')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['games:read'])]
+    #[Assert\NotNull(message: "L'éditeur est obligatoire.")]
     private ?Editor $editor = null;
 
     public function __construct()

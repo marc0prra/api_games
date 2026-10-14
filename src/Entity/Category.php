@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
@@ -19,13 +20,15 @@ class Category
 
     #[ORM\Column(length: 255)]
     #[Groups(['category:read', 'games:read'])]
+    #[Assert\NotBlank(message: 'Le nom de la catégorie est obligatoire.')]
+    #[Assert\Length(min: 2, max: 255, minMessage: 'Le nom doit faire au moins {{ limit }} caractères.', maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $name = null;
 
     /**
      * @var Collection<int, VideoGame>
      */
     #[ORM\ManyToMany(targetEntity: VideoGame::class, mappedBy: 'categories')]
-    #[Groups(['category:read', 'games:read'])]
+    #[Groups(['category:read'])]
     private Collection $videoGames;
 
     public function __construct()
