@@ -45,6 +45,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(min: 6, minMessage: 'Le mot de passe doit faire au moins {{ limit }} caractères.')]
     private ?string $password = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    #[Groups(['user:read'])]
+    private bool $subcriptionToNewsletter = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -118,5 +122,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
         
         return $data;
+    }
+
+    public function isSubcriptionToNewsletter(): bool
+    {
+        return $this->subcriptionToNewsletter;
+    }
+
+    public function setSubcriptionToNewsletter(bool $subcriptionToNewsletter): static
+    {
+        $this->subcriptionToNewsletter = $subcriptionToNewsletter;
+
+        return $this;
     }
 }
