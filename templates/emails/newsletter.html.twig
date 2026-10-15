@@ -1,0 +1,17 @@
+<h1>Les sorties de la semaine 🎮</h1>
+
+{% if games is empty %}
+    <p>Aucun jeu ne sort dans les 7 prochains jours.</p>
+{% else %}
+    <ul>
+        {% for game in games %}
+            <li>
+                {% if game.coverImage %}
+                    <img src="{{ game.coverImage }}" alt="{{ game.title }}" width="100">
+                {% endif %}
+                <strong>{{ game.title }}</strong>
+                ({{ game.editor.name }}) : sortie le {{ game.releaseDate|date('d/m/Y') }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

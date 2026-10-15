@@ -25,6 +25,17 @@ class VideoGameRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findUpcomingGames(): array
+    {
+        return $this->createQueryBuilder('v')
+            ->andWhere('v.releaseDate BETWEEN :start AND :end')
+            ->setParameter('start', new \DateTimeImmutable('today'))
+            ->setParameter('end', new \DateTimeImmutable('+7 days'))
+            ->orderBy('v.releaseDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 //    /**
 //     * @return VideoGame[] Returns an array of VideoGame objects
 //     */
