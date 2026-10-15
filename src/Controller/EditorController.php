@@ -19,9 +19,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class EditorController extends AbstractController
 {
     #[Route('/api/v1/editors', name: 'editors', methods: ['GET'])]
-    public function getEditors(EditorRepository $editorRepository): JsonResponse
+    public function getEditors(EditorRepository $editorRepository, Request $request): JsonResponse
     {
-        $editorList = $editorRepository->findAll();
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = max(1, $request->query->getInt('limit', 3));
+
+        $editorList = $editorRepository->findEditorWithPagination($page, $limit);
 
         return $this->json($editorList, Response::HTTP_OK, [], ['groups' => 'editor:read']);
     }

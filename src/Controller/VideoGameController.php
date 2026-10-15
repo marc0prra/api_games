@@ -22,9 +22,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class VideoGameController extends AbstractController
 {
     #[Route('/api/v1/games', name: 'games', methods: ['GET'])]
-    public function getGames(VideoGameRepository $videoGameRepository): JsonResponse
+    public function getGames(VideoGameRepository $videoGameRepository, Request $request): JsonResponse
     {
-        $gameList = $videoGameRepository->findAll();
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = max(1, $request->query->getInt('limit', 3));
+
+        $gameList = $videoGameRepository->findVideoGameWithPagination($page, $limit);
 
         return $this->json($gameList, Response::HTTP_OK, [], ['groups' => 'games:read']);
     }

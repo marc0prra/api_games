@@ -22,9 +22,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class UserController extends AbstractController
 {
     #[Route('/api/v1/users', name: 'users', methods: ['GET'])]
-    public function getUsers(UserRepository $userRepository): JsonResponse
+    public function getUsers(UserRepository $userRepository, Request $request): JsonResponse
     {
-        $userList = $userRepository->findAll();
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = max(1, $request->query->getInt('limit', 3));
+
+        $userList = $userRepository->findUserWithPagination($page, $limit);
 
         return $this->json($userList, Response::HTTP_OK, [], ['groups' => 'user:read']);
     }

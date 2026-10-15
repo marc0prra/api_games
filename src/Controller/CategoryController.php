@@ -19,9 +19,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CategoryController extends AbstractController
 {
     #[Route('/api/v1/categories', name: 'categories', methods: ['GET'])]
-    public function getCategories(CategoryRepository $categoryRepository): JsonResponse
+    public function getCategories(CategoryRepository $categoryRepository, Request $request): JsonResponse
     {
-        $categoryList = $categoryRepository->findAll();
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = max(1, $request->query->getInt('limit', 3));
+
+        $categoryList = $categoryRepository->findCategoryWithPagination($page, $limit);
 
         return $this->json($categoryList, Response::HTTP_OK, [], ['groups' => 'category:read']);
     }

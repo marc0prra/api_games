@@ -16,6 +16,16 @@ class EditorRepository extends ServiceEntityRepository
         parent::__construct($registry, Editor::class);
     }
 
+    public function findEditorWithPagination(int $page, int $limit): array
+    {
+        return $this->createQueryBuilder('e')
+            ->orderBy('e.id', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Editor[] Returns an array of Editor objects
 //     */
