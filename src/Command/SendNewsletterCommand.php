@@ -9,7 +9,9 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
+#[AsCronTask('30 8 * * 1', timezone: 'Europe/Paris')]
 #[AsCommand(
     name: 'app:send-newsletter',
     description: 'Envoie la newsletter des jeux qui sortent dans les 7 prochains jours aux abonnés',
