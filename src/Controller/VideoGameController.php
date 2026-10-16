@@ -64,7 +64,7 @@ final class VideoGameController extends AbstractController
 
     #[Route('/api/v1/games/{id}', name: 'updateGame', requirements: ['id' => '\d+'], methods: ['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: "Vous n'avez pas les droits suffisants pour modifier un jeu.")]
-    public function updateGame(Request $request, VideoGame $currentGame, SerializerInterface $serializer, EntityManagerInterface $em, ValidatorInterface $validator, EditorRepository $editorRepository, CategoryRepository $categoryRepository): JsonResponse
+    public function updateGame(Request $request, VideoGame $currentGame, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, ValidatorInterface $validator, EditorRepository $editorRepository, CategoryRepository $categoryRepository): JsonResponse
     {
         $serializer->deserialize($request->getContent(), VideoGame::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $currentGame]);
 
@@ -87,7 +87,9 @@ final class VideoGameController extends AbstractController
 
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        $location = $urlGenerator->generate('detailGame', ['id' => $currentGame->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return $this->json(['status' => 'success'], Response::HTTP_OK, ['Location' => $location]);
     }
 
     #[Route('/api/v1/games/{id}', name: 'deleteGame', requirements: ['id' => '\d+'], methods: ['DELETE'])]
@@ -97,7 +99,7 @@ final class VideoGameController extends AbstractController
         $em->remove($videoGame);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(['status' => 'success'], Response::HTTP_OK);
     }
 
     private function attachEditor(VideoGame $videoGame, mixed $idEditor, EditorRepository $editorRepository): void

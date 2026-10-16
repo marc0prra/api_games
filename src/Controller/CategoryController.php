@@ -56,7 +56,7 @@ class CategoryController extends AbstractController
 
     #[Route('/api/v1/categories/{id}', name: 'updateCategory', requirements: ['id' => '\d+'], methods: ['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: "Vous n'avez pas les droits suffisants pour modifier une catégorie.")]
-    public function updateCategory(Request $request, Category $currentCategory, SerializerInterface $serializer, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
+    public function updateCategory(Request $request, Category $currentCategory, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, ValidatorInterface $validator): JsonResponse
     {
         $serializer->deserialize($request->getContent(), Category::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $currentCategory]);
 
@@ -67,7 +67,9 @@ class CategoryController extends AbstractController
 
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        $location = $urlGenerator->generate('detailCategory', ['id' => $currentCategory->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return $this->json(['status' => 'success'], Response::HTTP_OK, ['Location' => $location]);
     }
 
     #[Route('/api/v1/categories/{id}', name: 'deleteCategory', requirements: ['id' => '\d+'], methods: ['DELETE'])]
@@ -79,6 +81,6 @@ class CategoryController extends AbstractController
         $em->remove($category);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(['status' => 'success'], Response::HTTP_OK);
     }
 }

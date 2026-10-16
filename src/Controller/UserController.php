@@ -60,7 +60,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/api/v1/users/{id}', name: 'updateUser', requirements: ['id' => '\d+'], methods: ['PUT'])]
-    public function updateUser(Request $request, User $currentUser, SerializerInterface $serializer, EntityManagerInterface $em, ValidatorInterface $validator, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    public function updateUser(Request $request, User $currentUser, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, ValidatorInterface $validator, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $serializer->deserialize($request->getContent(), User::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $currentUser]);
 
@@ -77,7 +77,9 @@ class UserController extends AbstractController
 
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        $location = $urlGenerator->generate('detailUser', ['id' => $currentUser->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return $this->json(['status' => 'success'], Response::HTTP_OK, ['Location' => $location]);
     }
 
     #[Route('/api/v1/users/{id}', name: 'deleteUser', requirements: ['id' => '\d+'], methods: ['DELETE'])]
@@ -93,6 +95,6 @@ class UserController extends AbstractController
         $em->remove($user);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(['status' => 'success'], Response::HTTP_OK);
     }
 }

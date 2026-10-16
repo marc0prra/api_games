@@ -56,7 +56,7 @@ class EditorController extends AbstractController
 
     #[Route('/api/v1/editors/{id}', name: 'updateEditor', requirements: ['id' => '\d+'], methods: ['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: "Vous n'avez pas les droits suffisants pour modifier un éditeur.")]
-    public function updateEditor(Request $request, Editor $currentEditor, SerializerInterface $serializer, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
+    public function updateEditor(Request $request, Editor $currentEditor, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, ValidatorInterface $validator): JsonResponse
     {
         $serializer->deserialize($request->getContent(), Editor::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $currentEditor]);
 
@@ -67,7 +67,9 @@ class EditorController extends AbstractController
 
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        $location = $urlGenerator->generate('detailEditor', ['id' => $currentEditor->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return $this->json(['status' => 'success'], Response::HTTP_OK, ['Location' => $location]);
     }
 
     #[Route('/api/v1/editors/{id}', name: 'deleteEditor', requirements: ['id' => '\d+'], methods: ['DELETE'])]
@@ -84,6 +86,6 @@ class EditorController extends AbstractController
         $em->remove($editor);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(['status' => 'success'], Response::HTTP_OK);
     }
 }
