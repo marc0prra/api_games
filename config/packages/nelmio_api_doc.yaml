@@ -1,9 +1,71 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: My App
-            description: This is an awesome app!
+            title: API Jeux vidéo
+            description: |
+                API REST de gestion de jeux vidéo, catégories, éditeurs et utilisateurs.
+
+                Authentification : récupérer un token via `POST /api/login_check`,
+                puis cliquer sur **Authorize** et coller le token.
+                Seul un `ROLE_ADMIN` peut créer, modifier ou supprimer des ressources et gérer les utilisateurs.
             version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+            schemas:
+                Error:
+                    type: object
+                    properties:
+                        status: { type: integer, example: 404 }
+                        message: { type: string, example: 'Ressource introuvable.' }
+                Success:
+                    type: object
+                    properties:
+                        status: { type: string, example: success }
+        security:
+            - Bearer: []
+        paths:
+            /api/login_check:
+                post:
+                    tags: [Authentification]
+                    summary: Obtenir un token JWT
+                    security: []
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required: [username, password]
+                                    properties:
+                                        username: { type: string, example: marco@exemple.fr }
+                                        password: { type: string, example: admin123 }
+                    responses:
+                        '200':
+                            description: Token JWT
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token: { type: string }
+                        '401':
+                            description: Identifiants invalides
     areas: # to filter documented areas
         path_patterns:
-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+            - ^/api(?!/doc) # Accepts routes under /api except /api/doc and /api/doc.json
+    models:
+        names:
+            # Versions imbriquées (relations sérialisées avec le groupe du parent).
+            # À déclarer avant les modèles parents : Nelmio décrit les relations dès l'enregistrement.
+            - { alias: CategorySummary, type: App\Entity\Category, groups: ['games:read'] }
+            - { alias: EditorSummary, type: App\Entity\Editor, groups: ['games:read'] }
+            - { alias: VideoGameInCategory, type: App\Entity\VideoGame, groups: ['category:read'] }
+            - { alias: VideoGameInEditor, type: App\Entity\VideoGame, groups: ['editor:read'] }
+            - { alias: VideoGame, type: App\Entity\VideoGame, groups: ['games:read'] }
+            - { alias: Category, type: App\Entity\Category, groups: ['category:read'] }
+            - { alias: Editor, type: App\Entity\Editor, groups: ['editor:read'] }
+            - { alias: User, type: App\Entity\User, groups: ['user:read'] }
