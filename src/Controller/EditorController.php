@@ -115,6 +115,7 @@ class EditorController extends AbstractController
     #[OA\Delete(summary: 'Supprimer un éditeur')]
     #[OA\Response(response: 200, description: 'Ressource supprimée', content: new OA\JsonContent(ref: '#/components/schemas/Success'))]
     #[OA\Response(response: 403, description: 'Réservé aux administrateurs', content: new OA\JsonContent(ref: '#/components/schemas/Error'))]
+    #[OA\Response(response: 409, description: "L'éditeur possède encore des jeux", content: new OA\JsonContent(ref: '#/components/schemas/Error'))]
     #[OA\Response(response: 404, description: 'Ressource introuvable', content: new OA\JsonContent(ref: '#/components/schemas/Error'))]
     public function deleteEditor(Editor $editor, EntityManagerInterface $em): JsonResponse
     {

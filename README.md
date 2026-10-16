@@ -120,6 +120,7 @@ Préfixe : `/api/v1`. 🔒 = réservé à `ROLE_ADMIN`.
 | `401` | Token absent, invalide ou expiré |
 | `403` | Droits insuffisants (pas `ROLE_ADMIN`) |
 | `404` | Ressource ou route introuvable |
+| `409` | Suppression d'un éditeur qui possède encore des jeux |
 
 Les erreurs ont la forme `{"status": 404, "message": "..."}`.
 
